@@ -194,9 +194,11 @@ class Geometry():
 
         plane_vector = self.cross(cp_offset, offset_2, axis=2)
 
-        dihedral_cosines = self.sum(cp_base[:, ::2]*cp_offset[:, ::2],
+        dihedral_c = self.sum(cp_base[:, ::2]*cp_offset[:, ::2],
                                     axis=2)/self.norm(
             cp_base[:, ::2], axis=2)/self.norm(cp_offset[:, ::2], axis=2)
+
+        dihedral_cosines = self.arccos(self.clip(dihedral_c, lower_bound=-1., upper_bound=1.))
 
         dihedral_sines = self.sum(cp_base[:, ::2]*plane_vector[:, ::2],
                                   axis=2)/self.norm(
