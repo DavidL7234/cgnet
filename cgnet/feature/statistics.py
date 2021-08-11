@@ -67,7 +67,7 @@ class GeometryStatistics():
     def __init__(self, data, custom_feature_tuples=None, backbone_inds=None,
                  get_all_distances=False, get_backbone_angles=False,
                  get_backbone_dihedrals=False, temperature=300.0,
-                 get_redundant_distance_mapping=False, bond_pairs=None,
+                 get_redundant_distance_mapping=False, bond_pairs=[],
                  adjacent_backbone_bonds=True):
         if torch.is_tensor(data):
             self.data = data.detach().numpy()
@@ -101,9 +101,6 @@ class GeometryStatistics():
         self._process_backbone(backbone_inds)
         self._process_custom_feature_tuples()
 
-        if bond_pairs is None:
-            bond_pairs = []
-
         if get_redundant_distance_mapping and not get_all_distances:
             raise ValueError(
                 "Redundant distance mapping can only be returned "
@@ -129,14 +126,12 @@ class GeometryStatistics():
 
         self.distances = []
         self.angles = []
-        self.dihedral_cosines = []
-        self.dihedral_sines = []
+        self.dihedral = []
 
         self.descriptions = {
             'Distances': [],
             'Angles': [],
-            'Dihedral_cosines': [],
-            'Dihedral_sines': []
+            'Dihedral': [],
         }
 
         self._stats_dict = {}
@@ -239,7 +234,7 @@ class GeometryStatistics():
         self._master_stat_array = [[] for _ in range(3)]
 
         for feature_type in self.order:
-            if feature_type not in ['Dihedral_cosines', 'Dihedral_sines']:
+            if feature_type not in ['Dihedral']:
                 self.feature_tuples.extend(self.descriptions[feature_type])
                 self.master_description_tuples.extend(
                     self.descriptions[feature_type])
@@ -260,7 +255,7 @@ class GeometryStatistics():
                     self._stats_dict[feature_type]['std'])
                 self._master_stat_array[2].extend(
                     self._stats_dict[feature_type]['k'])
-                if feature_type == 'Dihedral_cosines':
+                if feature_type == 'Dihedral':
                     # because they have the same indices as dihedral sines,
                     # do only cosines
                     self.feature_tuples.extend(self.descriptions[feature_type])
@@ -378,16 +373,12 @@ class GeometryStatistics():
     def _get_dihedrals(self):
         """Obtains all dihedral angles for the four-bead indices provided.
         """
-        (self.dihedral_cosines,
-            self.dihedral_sines) = g.get_dihedrals(self._dihedral_quads, self.data)
+        self.dihedral = g.get_dihedrals(self._dihedral_quads, self.data)
 
         self.descriptions['Dihedral_cosines'].extend(self._dihedral_quads)
-        self.descriptions['Dihedral_sines'].extend(self._dihedral_quads)
 
-        self._get_stats(self.dihedral_cosines, 'Dihedral_cosines')
-        self._get_stats(self.dihedral_sines, 'Dihedral_sines')
-        self.order += ['Dihedral_cosines']
-        self.order += ['Dihedral_sines']
+        self._get_stats(self.dihedral, 'Dihedral')
+        self.order += ['Dihedral']
 
     def _get_stats(self, X, key):
         """Populates stats dictionary with mean and std of feature.
@@ -579,7 +570,7 @@ class GeometryStatistics():
                     "Error: \'{}\' is not a valid backbone feature.".format(
                         features)
                 )
-            if features in ["Distances", "Angles"]:
+            if features in ["Distances", "Angles", "Dihedral"]:
                 return [ind for ind, feat in
                         enumerate(self.master_description_tuples)
                         if feat in self.descriptions[features]]
