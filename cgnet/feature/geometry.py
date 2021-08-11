@@ -194,21 +194,19 @@ class Geometry():
 
         plane_vector = self.cross(cp_offset, offset_2, axis=2)
 
-        dihedral_c = self.sum(cp_base[:, ::2]*cp_offset[:, ::2],
+        dihedral_cosines = self.sum(cp_base[:, ::2]*cp_offset[:, ::2],
                                     axis=2)/self.norm(
             cp_base[:, ::2], axis=2)/self.norm(cp_offset[:, ::2], axis=2)
-
-        dihedral_cosines = self.arccos(self.clip(dihedral_c, lower_bound=-1., upper_bound=1.))
 
         dihedral_sines = self.sum(cp_base[:, ::2]*plane_vector[:, ::2],
                                   axis=2)/self.norm(
             cp_base[:, ::2], axis=2)/self.norm(plane_vector[:, ::2], axis=2)
 
+        dihedral_rad = self.arctan(dihedral_sines/dihedral_cosines)
 
-        self.check_for_nans(dihedral_cosines, 'dihedral cosines')
-        self.check_for_nans(dihedral_sines, 'dihedral sines')
+        self.check_for_nans(dihedral_rad, 'dihedral')
 
-        return dihedral_cosines, dihedral_sines
+        return dihedral_rad
 
     def get_neighbors(self, distances, cutoff=None):
         """Calculates a simple neighbor list in which every bead sees
@@ -283,6 +281,12 @@ class Geometry():
             return torch.acos(x)
         elif self.method == 'numpy':
             return np.arccos(x)
+
+    def arctan(self, x):
+        if self.method == 'torch':
+            return torch.atan(x)
+        elif self.method == 'numpy':
+            return np.arctan(x)
 
     def cross(self, x, y, axis):
         if self.method == 'torch':
