@@ -375,7 +375,7 @@ class GeometryStatistics():
         """
         self.dihedral = g.get_dihedrals(self._dihedral_quads, self.data)
 
-        self.descriptions['Dihedral_cosines'].extend(self._dihedral_quads)
+        self.descriptions['Dihedral'].extend(self._dihedral_quads)
 
         self._get_stats(self.dihedral, 'Dihedral')
         self.order += ['Dihedral']
