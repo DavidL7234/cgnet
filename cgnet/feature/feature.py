@@ -116,11 +116,9 @@ class GeometryFeature(nn.Module):
 
     def compute_dihedrals(self, data):
         """Computes four-term dihedral (torsional) angles."""
-        (self.dihedral_cosines,
-         self.dihedral_sines) = self.geometry.get_dihedrals(self._dihedral_quads,
+        self.dihedral = self.geometry.get_dihedrals(self._dihedral_quads,
                                                             data)
-        self.descriptions["Dihedral_cosines"] = self._dihedral_quads
-        self.descriptions["Dihedral_sines"] = self._dihedral_quads
+        self.descriptions["Dihedral"] = self._dihedral_quads
 
     def forward(self, data):
         """Obtain differentiable feature
@@ -168,14 +166,10 @@ class GeometryFeature(nn.Module):
 
         if len(self._dihedral_quads) > 0:
             self.compute_dihedrals(data)
-            out = torch.cat((out,
-                             self.dihedral_cosines,
-                             self.dihedral_sines), dim=1)
-            self.description_order.append('Dihedral_cosines')
-            self.description_order.append('Dihedral_sines')
+            out = torch.cat((out, self.dihedral), dim=1)
+            self.description_order.append('Dihedral')
         else:
-            self.dihedral_cosines = torch.Tensor([])
-            self.dihedral_sines = torch.Tensor([])
+            self.dihedral = torch.Tensor([])
 
         return out
 
