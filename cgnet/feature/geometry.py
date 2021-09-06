@@ -203,10 +203,10 @@ class Geometry():
             cp_base[:, ::2], axis=2)/self.norm(plane_vector[:, ::2], axis=2)
 
         #dihedral_rad = self.arccos(dihedral_sines / dihedral_cosines)
-        #dihedral_rad = self.arccos(dihedral_cosines)
-        dihedral_rad = self.arccos(self.clip(dihedral_cosines,
-                                             lower_bound=-1.,
-                                             upper_bound=1.))
+        dihedral_rad = self.arccos(dihedral_cosines)
+        #dihedral_rad = self.arccos(self.clip(dihedral_cosines,
+        #                                     lower_bound=-1.,
+        #                                     upper_bound=1.))
 
         self.check_for_nans(dihedral_rad, 'dihedral')
 
