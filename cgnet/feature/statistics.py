@@ -387,7 +387,7 @@ class GeometryStatistics():
         if key != 'Dihedral':
             mean = np.mean(X, axis=0)
         else:
-            mean = circmean(X, low=-np.pi, high=np.pi, axis=0)
+            mean = circmean(X, low=-np.pi/2, high=np.pi/2, axis=0)
         #mean = np.mean(X, axis=0)
         std = np.std(X, axis=0)
         var = np.var(X, axis=0)
