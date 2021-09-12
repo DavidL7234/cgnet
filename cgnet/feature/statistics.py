@@ -384,10 +384,11 @@ class GeometryStatistics():
     def _get_stats(self, X, key):
         """Populates stats dictionary with mean and std of feature.
         """
-        if key != 'Dihedral':
-            mean = np.mean(X, axis=0)
-        else:
-            mean = circmean(X, low=-np.pi, high=np.pi, axis=0)
+        #if key != 'Dihedral':
+        #    mean = np.mean(X, axis=0)
+        #else:
+        #    mean = circmean(X, low=-np.pi, high=np.pi, axis=0)
+        mean = np.mean(X, axis=0)
         std = np.std(X, axis=0)
         var = np.var(X, axis=0)
         k = 1/var/self.beta
